@@ -792,14 +792,12 @@ struct ProgressBoardView: View {
                 }
             }
             
-            let purchaseManager = PurchaseManager.shared 
             let healthKitManager = HealthKitManager.shared
             healthKitManager.configureWithModelContext(container.mainContext) // Configure HKM for preview
             healthKitManager.isAuthorized = true // Assume authorized for preview
             
             return ProgressBoardView()
                 .modelContainer(container)
-                .environmentObject(purchaseManager) 
                 .environmentObject(healthKitManager)
         }
     }

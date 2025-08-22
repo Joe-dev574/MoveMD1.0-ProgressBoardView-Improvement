@@ -6,7 +6,6 @@ import HealthKit
 struct WorkoutSessionView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject var purchaseManager: PurchaseManager
     @EnvironmentObject var healthKitManager: HealthKitManager
     @EnvironmentObject var authManager: AuthenticationManager
     @EnvironmentObject var errorManager: ErrorManager

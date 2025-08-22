@@ -5,13 +5,13 @@
 //  Created by Joseph DeWeese on 5/12/25.
 //
 
-// AuthenticationManager.swift
 import SwiftUI
 import AuthenticationServices
 import SwiftData
 import OSLog
 import Security
 
+/// Manages user authentication using Sign In with Apple, handling user sessions, Keychain storage, SwiftData integration, and HealthKit triggers.
 @MainActor
 final class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
     
@@ -32,7 +32,6 @@ final class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationCo
     private var modelContext: ModelContext?
     private let keychainService: String
     private let appleUserIdKeychainAccount = "appleUserId"
-
     private let logger: Logger
 
     override init() {

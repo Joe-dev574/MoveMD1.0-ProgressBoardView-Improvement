@@ -322,7 +322,6 @@ private struct WorkoutDetailPreviewWrapper: View {
                 NavigationStack {
                     WorkoutDetailView(workout: workout)
                         .modelContainer(container)
-                        .environmentObject(PurchaseManager.shared)
                 }
             } else {
                 Text("Preview unavailable.")

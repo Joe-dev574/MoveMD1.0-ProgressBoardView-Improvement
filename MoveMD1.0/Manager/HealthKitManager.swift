@@ -174,11 +174,6 @@ class HealthKitManager: ObservableObject {
             logger.error("Cannot save workout: HealthKit not authorized.")
             throw HealthKitError.authorizationFailed("Permission not granted to save workout.")
         }
-        guard PurchaseManager.shared.isUnlocked else {
-            logger.error("App purchase required for saving workout (trial ended or not purchased)")
-            throw HealthKitError.appPurchaseRequired
-        }
-        
         guard history.lastSessionDuration > 0 else {
             logger.error("Invalid workout duration: \(history.lastSessionDuration)")
             throw HealthKitError.invalidWorkoutDuration

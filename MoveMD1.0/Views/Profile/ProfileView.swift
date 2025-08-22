@@ -65,7 +65,7 @@ private struct ProfileFormContentView: View {
     @Binding var selectedPhoto: PhotosPickerItem?
     @Binding var selectedProgressSelfieItems: [PhotosPickerItem]
     @Binding var selectedSelfieForDetail: ProgressSelfie?
-    @ObservedObject var purchaseManager: PurchaseManager
+   
 
     @Binding var weightString: String
     @Binding var heightString: String
@@ -168,7 +168,6 @@ private struct ProfileFormContentView: View {
 struct ProfileView: View {
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject var authManager: AuthenticationManager
-    @EnvironmentObject var purchaseManager: PurchaseManager
     @EnvironmentObject var errorManager: ErrorManager
     
     @AppStorage("unitSystem") private var unitSystem: UnitSystem = .imperial
@@ -218,7 +217,6 @@ struct ProfileView: View {
                         selectedPhoto: $selectedPhoto,
                         selectedProgressSelfieItems: $selectedProgressSelfieItems,
                         selectedSelfieForDetail: $presentingSelfieDetail,
-                        purchaseManager: purchaseManager,
                         weightString: $weightString,
                         heightString: $heightString,
                         maxHRString: $maxHRString,
@@ -250,12 +248,11 @@ struct ProfileView: View {
                     return
                 }
                 updateLocalHealthMetricStrings(fromUser: userForTask)
-
-                let isUnlocked = purchaseManager.isUnlocked
+                
                 let isHKAuthorized = HealthKitManager.shared.isAuthorized
-                logger.info("Conditions for fetching HK data: isUnlocked=\(isUnlocked), isHKAuthorized=\(isHKAuthorized)")
+                logger.info("Conditions for fetching HK data:  isHKAuthorized=\(isHKAuthorized)")
 
-                if isUnlocked && isHKAuthorized {
+                if isHKAuthorized {
                     isLoadingHealthData = true
                     logger.info("Fetching HealthKit data...")
                     HealthKitManager.shared.setCurrentAppleUserId(userForTask.appleUserId)
@@ -463,60 +460,4 @@ struct ProfileView: View {
      }
 }
 
-#if DEBUG
-struct ProfileView_Previews: PreviewProvider {
 
-    @MainActor
-    private struct PreviewLoader: View {
-        @State private var loadedData: (container: ModelContainer, authManager: AuthenticationManager, purchaseManager: PurchaseManager)? = nil
-        @State private var loadingError: Error? = nil
-        @State private var isLoading: Bool = true
-
-        var body: some View {
-            Group {
-                if isLoading {
-                    ProgressView("Loading Preview...")
-                } else if let error = loadingError {
-                    Text("Failed to load preview: \(error.localizedDescription)")
-                        .padding()
-                } else if let data = loadedData {
-                    ProfileView()
-                        .modelContainer(data.container)
-                        .environmentObject(data.authManager)
-                        .environmentObject(data.purchaseManager)
-                } else {
-                    Text("Preview unavailable.")
-                }
-            }
-            .task {
-                guard isLoading else { return }
-
-                do {
-                    let config = ModelConfiguration(isStoredInMemoryOnly: true)
-                    let container = try ModelContainer(for: User.self, configurations: config)
-
-                    let authManager = AuthenticationManager()
-                    let purchaseManager = PurchaseManager.shared
-
-                    let mockUser = User(appleUserId: "mock_user_id_123")
-                    mockUser.name = "Preview User"
-                    mockUser.email = "preview@example.com"
-                    container.mainContext.insert(mockUser)
-                    authManager.currentAppleUser = mockUser
-
-                    self.loadedData = (container, authManager, purchaseManager)
-                    self.loadingError = nil
-                } catch {
-                    self.loadingError = error
-                    self.loadedData = nil
-                }
-                self.isLoading = false
-            }
-        }
-    }
-
-    static var previews: some View {
-        PreviewLoader()
-    }
-}
-#endif
